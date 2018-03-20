@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#17b060</color>
+    <color name="colorPrimaryDark">#17b060</color>
+    <color name="colorAccent">#08c14f</color>
+
+    <color name="LightThemecolorPrimary">#1c1d1c</color>
+    <color name="LightThemecolorPrimaryDark">#404140</color>
+    <color name="LightThemecolorAccent">#939694</color>
+
+    <color name="DarkThemecolorPrimary">#1c1d1c</color>
+    <color name="DarkThemecolorPrimaryDark">#404140</color>
+    <color name="DarkThemecolorAccent">#939694</color>
+
+    <color name="light_grey">#5dc17e</color>
+
+</resources>

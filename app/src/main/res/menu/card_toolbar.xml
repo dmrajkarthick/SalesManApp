@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:compat="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:title="Share"
+        android:icon="@drawable/ic_menu_share"
+        android:id="@+id/contentShare"
+        android:numericShortcut="1"
+        compat:showAsAction="ifRoom"/>
+
+    <item
+        android:title="Bookmark"
+        android:icon="@drawable/ic_menu_bookmark"
+        android:id="@+id/contentBookmark"
+        android:checked="true"
+        compat:showAsAction="ifRoom" />
+
+</menu>
