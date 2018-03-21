@@ -109,10 +109,18 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
         setUpNavigationView();
 
         if (savedInstanceState == null) {
-            navItemIndex = 0;
-            CURRENT_TAG = TAG_HOME;
-            loadHomeFragment();
+            navItemIndex = 1;
+            CURRENT_TAG = TAG_PHOTOS;
+
         }
+
+
+        if(getIntent().getExtras()!=null) {
+            if (getIntent().getExtras().getInt("navItemIndex") == 0) {
+                navItemIndex = 0;
+            }
+        }
+        loadHomeFragment();
     }
 
     /***

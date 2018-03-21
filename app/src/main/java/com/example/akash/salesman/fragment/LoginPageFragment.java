@@ -99,6 +99,9 @@ public class LoginPageFragment extends Fragment {
                 {
                     Toast.makeText(getActivity(),"Sign In Successful", Toast.LENGTH_SHORT).show();
                     Intent randIntent = new Intent(getContext(), MainActivity.class);
+                    Bundle basket = new Bundle();
+                    basket.putInt("navItemIndex", 0);
+                    randIntent.putExtras(basket);
                     navItemIndex = 0;
                     startActivity(randIntent);
 
