@@ -86,7 +86,7 @@ public class CategoryPageFragment extends Fragment {
             mListener = (OnCategoryFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
+                    + " must implement OnBookMarksFragmentInteractionListener");
         }
     }
 

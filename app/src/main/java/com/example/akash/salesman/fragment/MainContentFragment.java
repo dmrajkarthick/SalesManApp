@@ -62,27 +62,6 @@ public class MainContentFragment extends Fragment {
         List<ContentItem> contentItems = dbOperations.getMainContentPageData(categoryPageItem.getCategory_name());
         dbOperations.close();
 
-        /*ArrayList<MainContentFragmentSectionModel> sectionModelArrayList = new ArrayList<>();
-        //for loop for sections
-        for (int i = 0; i < contentItems.size(); ) {
-            ArrayList<ContentItem> itemArrayList = new ArrayList<>();
-            String sectionHeading = contentItems.get(i).getSubTopicTitle();
-            //for loop for items
-            int ct = 0;
-            while(i < contentItems.size())
-            {
-                if(contentItems.get(i).getSubTopicTitle().contentEquals(sectionHeading)) {
-                    itemArrayList.add(contentItems.get(i));
-                    i++;
-                }
-                else{
-                    break;
-                }
-            }
-            //add the section and items to array list
-            sectionModelArrayList.add(new MainContentFragmentSectionModel(sectionHeading, itemArrayList));
-        }*/
-
         MainPageRecyclerViewAdapter adapter = new MainPageRecyclerViewAdapter(contentItems, mListener);
         recyclerView.setAdapter(adapter);
 

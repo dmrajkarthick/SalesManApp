@@ -14,6 +14,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,19 +27,20 @@ import com.example.akash.salesman.R;
 import com.example.akash.salesman.fragment.CategoryPageFragment;
 import com.example.akash.salesman.fragment.LoginPageFragment;
 import com.example.akash.salesman.fragment.MainContentFragment;
-import com.example.akash.salesman.fragment.MoviesFragment;
+import com.example.akash.salesman.fragment.BookMarksFragment;
 import com.example.akash.salesman.fragment.NotificationsFragment;
 import com.example.akash.salesman.fragment.ScreenSliderPagerFragment;
 import com.example.akash.salesman.fragment.SettingsFragment;
 import com.example.akash.salesman.other.CategoryPageItem;
 import com.example.akash.salesman.other.ContentItem;
+import com.example.akash.salesman.other.DBOperations;
 import com.example.akash.salesman.other.FragmentInfo;
 import com.example.akash.salesman.other.TabbedContentFragment;
 
 import java.util.List;
 import java.util.Stack;
 
-public class MainActivity extends AppCompatActivity implements CategoryPageFragment.OnCategoryFragmentInteractionListener, MainContentFragment.OnMainContentFragmentInteractionListener, ScreenSliderPagerFragment.OnFragmentInteractionListener, TabbedContentFragment.OnFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity implements CategoryPageFragment.OnCategoryFragmentInteractionListener, MainContentFragment.OnMainContentFragmentInteractionListener, ScreenSliderPagerFragment.OnFragmentInteractionListener, TabbedContentFragment.OnFragmentInteractionListener, LoginPageFragment.OnFragmentInteractionListener, BookMarksFragment.OnBookMarksFragmentInteractionListener{
 
     private NavigationView navigationView;
     private DrawerLayout drawer;
@@ -49,12 +51,12 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
     private FloatingActionButton fab;
 
     // index to identify current nav menu item
-    public static int navItemIndex = 0;
+    public static int navItemIndex = 1;
 
     // tags used to attach the fragments
     private static final String TAG_HOME = "home";
     private static final String TAG_PHOTOS = "photos";
-    private static final String TAG_MOVIES = "movies";
+    private static final String TAG_BOOKMARK = "bookmark";
     private static final String TAG_NOTIFICATIONS = "notifications";
     private static final String TAG_SETTINGS = "settings";
     private static final String TAG_MAIN_CONTENT_PAGE = "main_content_page";
@@ -140,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
 
         // if user select the current navigation menu again, don't do anything
         // just close the navigation drawer
-        if (getSupportFragmentManager().findFragmentByTag(CURRENT_TAG) != null) {
+        if (getSupportFragmentManager().findFragmentById(navItemIndex) != null) {
             drawer.closeDrawers();
 
             // show or hide the fab button
@@ -161,6 +163,11 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
                 fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
                         android.R.anim.fade_out);
                 fragmentTransaction.replace(R.id.frame_container, fragment, CURRENT_TAG);
+                FragmentInfo fragmentInfo = new FragmentInfo();
+                fragmentInfo.setFragment(fragment);
+                fragmentInfo.setNavItemIndex(navItemIndex);
+                fragmentInfo.setTag(CURRENT_TAG);
+                activeCenterFragments.push(fragmentInfo);
                 fragmentTransaction.commitAllowingStateLoss();
             }
         };
@@ -184,6 +191,15 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
         switch (navItemIndex) {
             case 0:
                 // home
+                if (activeCenterFragments.size() > 0) {
+                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    for (FragmentInfo activeFragment : activeCenterFragments) {
+                        fragmentTransaction.remove(activeFragment.getFragment());
+                    }
+                    activeCenterFragments.clear();
+                    fragmentTransaction.commit();
+                }
+
                 return CategoryPageFragment.newInstance(3);
 
             case 1:
@@ -192,8 +208,8 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
                 return loginPageFragment;
             case 2:
                 // movies fragment
-                MoviesFragment moviesFragment = new MoviesFragment();
-                return moviesFragment;
+                BookMarksFragment bookMarksFragment = new BookMarksFragment();
+                return bookMarksFragment;
             case 3:
                 // notifications fragment
                 NotificationsFragment notificationsFragment = new NotificationsFragment();
@@ -235,18 +251,18 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
                         navItemIndex = 1;
                         CURRENT_TAG = TAG_PHOTOS;
                         break;
-                    case R.id.nav_movies:
+                    case R.id.nav_bookmark:
                         navItemIndex = 2;
-                        CURRENT_TAG = TAG_MOVIES;
+                        CURRENT_TAG = TAG_BOOKMARK;
                         break;
-                    case R.id.nav_notifications:
+                    /*case R.id.nav_notifications:
                         navItemIndex = 3;
                         CURRENT_TAG = TAG_NOTIFICATIONS;
                         break;
                     case R.id.nav_settings:
                         navItemIndex = 4;
                         CURRENT_TAG = TAG_SETTINGS;
-                        break;
+                        break;*/
                     case R.id.nav_about_us:
                         // launch new intent instead of loading fragment
                         startActivity(new Intent(MainActivity.this, AboutUsActivity.class));
@@ -310,14 +326,49 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
         if (shouldLoadHomeFragOnBackPress) {
             // checking if user is on other navigation menu
             // rather than home
-            if (navItemIndex != 0) {
-                navItemIndex = 0;
-                CURRENT_TAG = TAG_HOME;
-                loadHomeFragment();
+            if(CURRENT_TAG.contentEquals(TAG_HOME) || activeCenterFragments.size() <= 1){
+
+                super.onBackPressed();
+            }
+            else{
+                Log.i("INFO", "CURRENT TAG: " + CURRENT_TAG);
+                Log.i("INFO", "Nav Item Index: " + navItemIndex);
+                FragmentInfo fragInfo = activeCenterFragments.pop();
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.remove(fragInfo.getFragment());
+
+                final FragmentInfo fragmentInfo = activeCenterFragments.peek();
+
+                navItemIndex = fragmentInfo.getNavItemIndex();
+                CURRENT_TAG = fragmentInfo.getTag();
+                setToolbarTitle();
+                Runnable mPendingRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+
+                        Fragment fragment = fragmentInfo.getFragment();
+                        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                        fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
+                                android.R.anim.fade_out);
+                        fragmentTransaction.replace(R.id.frame_container, fragment, CURRENT_TAG);
+                        FragmentInfo fragmentInfo = new FragmentInfo();
+                        fragmentInfo.setFragment(fragment);
+                        fragmentInfo.setNavItemIndex(navItemIndex);
+                        fragmentInfo.setTag(CURRENT_TAG);
+                        fragmentTransaction.commitAllowingStateLoss();
+                    }
+                };
+                if (mPendingRunnable != null) {
+                    mHandler.post(mPendingRunnable);
+                }
+
+                toggleFab();
+                drawer.closeDrawers();
+                invalidateOptionsMenu();
                 return;
+                //super.onBackPressed();
             }
         }
-
         super.onBackPressed();
     }
 
@@ -458,12 +509,21 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
 
     @Override
     public void onMenuItemClicklistener(ContentItem item) {
+        Bundle basket = new Bundle();
+        basket.putString("contentToBeShared", "Item Name: " + item.getItem_name()+"\n"+ "Description: " + item.getDisplay_content() +"\n"
+                        + "Owner: " + item.getOwner() + "\n" + "Contact: " + item.getContact());
 
+        Intent a = new Intent(MainActivity.this, ShareContentActivity.class);
+        a.putExtras(basket);
+        startActivity(a);
     }
 
     @Override
     public void onBookMarkofContent(ContentItem item) {
-
+        DBOperations dbOperations = new DBOperations(this);
+        dbOperations.open();
+        dbOperations.bookMarkContent(item);
+        dbOperations.close();
     }
 
     @Override

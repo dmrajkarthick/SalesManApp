@@ -64,11 +64,11 @@ class MainPageRecyclerViewAdapter extends RecyclerView.Adapter<MainPageRecyclerV
     @Override
     public void onBindViewHolder(final ItemViewHolder holder, int position) {
 
-        /*int bmValue = Integer.parseInt(mValues.get(position).getBookMark());
+        int bmValue = mValues.get(position).getBookmark();
         if(bmValue == 1) {
             toolbar.getMenu().clear();
             toolbar.inflateMenu(R.menu.bookmark_card_toolbar);
-        }*/
+        }
         holder.mItem = mValues.get(position);
         holder.mContentView.setText(mValues.get(position).getItem_name());
         holder.mMainContentView.setText(mValues.get(position).getDisplay_content());
@@ -95,7 +95,7 @@ class MainPageRecyclerViewAdapter extends RecyclerView.Adapter<MainPageRecyclerV
                             case R.id.contentBookmark:
                                 if(item.isChecked()){
                                     item.setChecked(false);
-                                    item.setIcon(R.drawable.ic_menu_bookmark);
+                                    item.setIcon(R.drawable.ic_menu_bookmarked);
                                 }
                                 else {
                                     item.setChecked(true);

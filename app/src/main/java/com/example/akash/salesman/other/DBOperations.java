@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class DBOperations {
 
@@ -96,6 +95,7 @@ public class DBOperations {
             byte[] blob = c.getBlob(iItemImage);
             ByteArrayInputStream inputStream = new ByteArrayInputStream(blob);
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            item.setCategory_name(category_name);
             item.setItem_image(bitmap);
             item.setItem_name(c.getString(iItemName));
             item.setDisplay_content(c.getString(iDisplayContent));
@@ -108,10 +108,136 @@ public class DBOperations {
         return contentItems;
     }
 
+    public List<ContentItem> getBookMarkedData() {
+        List<CategoryPageItem> categoryPageItems = getAllCategories();
+
+        List<ContentItem> contentItems = new ArrayList<>();
+        String[] columns = new String[]{KEY_ITEMID, KEY_ITEMIMAGE, KEY_ITEMNAME, KEY_DISPLAYCONTENT, KEY_BOOKMARK, KEY_CONTACT, KEY_OWNER};
+
+        for (CategoryPageItem categoryPageItem : categoryPageItems) {
+
+            Cursor c = myDataBase.query(categoryPageItem.getCategory_name(), columns, KEY_BOOKMARK + "=1", null, null, null, null);
+
+            int iItemID = c.getColumnIndex(KEY_ITEMID);
+            int iItemImage = c.getColumnIndex(KEY_ITEMIMAGE);
+            int iItemName = c.getColumnIndex(KEY_ITEMNAME);
+            int iDisplayContent = c.getColumnIndex(KEY_DISPLAYCONTENT);
+            int iBookMark = c.getColumnIndex(KEY_BOOKMARK);
+            int iOwner = c.getColumnIndex(KEY_CONTACT);
+            int iContact = c.getColumnIndex(KEY_OWNER);
+
+            for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+                ContentItem item = new ContentItem();
+                item.setItem_id(c.getInt(iItemID));
+                byte[] blob = c.getBlob(iItemImage);
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(blob);
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                item.setCategory_name(categoryPageItem.getCategory_name());
+                item.setItem_image(bitmap);
+                item.setItem_name(c.getString(iItemName));
+                item.setDisplay_content(c.getString(iDisplayContent));
+                item.setBookmark(c.getInt(iBookMark));
+                item.setOwner(c.getString(iOwner));
+                item.setContact(c.getString(iContact));
+
+                contentItems.add(item);
+            }
+        }
+        return contentItems;
+
+    }
+
+    public int getBookMarkValueOfRecord(String tableName, String itemID)
+    {
+        String[] columns = new String[]{ KEY_BOOKMARK};
+        Cursor c = myDataBase.query(tableName, columns, KEY_ITEMID+"="+itemID, null, null, null, null);
+        int bmValue = 0;
+        int iBookMark = c.getColumnIndex(KEY_BOOKMARK);
+
+        if(c!=null)
+        {
+            c.moveToFirst();
+            bmValue = c.getInt(iBookMark);
+        }
+        return bmValue;
+    }
+
+    public void bookMarkContent(ContentItem item) {
+        ContentValues cv = new ContentValues();
+        String tableName = item.getCategory_name();
+        String itemID = item.getItem_id()+"";
+        int bookMarkValue = getBookMarkValueOfRecord(tableName, itemID);
+        if(bookMarkValue == 0) {
+            cv.put(KEY_BOOKMARK , 1);
+        }
+        else if(bookMarkValue == 1)
+        {
+            cv.put(KEY_BOOKMARK, 0);
+        }
+        myDataBase.update(tableName, cv,  KEY_ITEMID+"="+itemID, null);
+
+        return;
+
+    }
+
+
+    public boolean signUpDataInsert(String un, String password){
+/*
+        List<String> userNames = new ArrayList<>();
+        String[] columns = new String[]{"username"};
+
+        Cursor c = myDataBase.query("userdata", columns, null,null,null,null,null);
+
+        int iuserName = c.getColumnIndex("username");
+
+        for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext())
+        {
+            userNames.add(c.getString(iuserName));
+        }
+
+        if(userNames.contains(un))
+        {
+            return false;
+        }*/
+
+        ContentValues insertValues = new ContentValues();
+        insertValues.put("username", un);
+        insertValues.put("password", password);
+        long val = myDataBase.insertOrThrow("userdata", null, insertValues);
+
+
+        return true;
+    }
+
+    public boolean signInDataCheck(String un, String password){
+
+        String[] columns = new String[]{"username", "password"};
+
+        Cursor c = myDataBase.query("userdata", columns, null,null,null,null,null);
+
+        int iuserName = c.getColumnIndex("username");
+        int iPassword = c.getColumnIndex("password");
+
+        for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext())
+        {
+            String userN = c.getString(iuserName).toString();
+            String pass = c.getString(iPassword).toString();
+            if(userN.equalsIgnoreCase(un) && pass.equalsIgnoreCase(password))
+            {
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
+
+
+
     private static class DBHelper extends SQLiteOpenHelper
     {
         String DB_PATH = null;
-
 
         private final Context myContext;
 
@@ -127,14 +253,14 @@ public class DBOperations {
             boolean dbExist = checkDataBase();
             if (dbExist) {
                 // this part of the code replaces the DB everytime App is opened!
-                this.getReadableDatabase();
+                this.getWritableDatabase();
                 try {
                     copyDataBase();
                 } catch (IOException e) {
                     throw new Error("Error copying database");
                 }
             } else {
-                this.getReadableDatabase();
+                this.getWritableDatabase();
                 try {
                     copyDataBase();
                 } catch (IOException e) {
@@ -217,8 +343,8 @@ public class DBOperations {
     public DBOperations open() throws SQLException
     {
         ourHelper = new DBHelper(ourContext);
-        //ourDatabase = ourHelper.getWritableDatabase();
-        try {
+        myDataBase = ourHelper.getWritableDatabase();
+        /*try {
 
             ourHelper.createDataBase();
 
@@ -227,9 +353,11 @@ public class DBOperations {
             throw new Error("Unable to create database");
 
         }
-        ourHelper.openDataBase();
+        ourHelper.openDataBase();*/
         return this;
     }
+
+
 
     public void close()
     {

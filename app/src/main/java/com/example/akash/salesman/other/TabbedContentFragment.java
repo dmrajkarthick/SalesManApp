@@ -96,10 +96,10 @@ public class TabbedContentFragment extends Fragment {
         String contact1 = bundle.getString("contact");
         String owner1 = bundle.getString("owner");
         text_view_for_tab_selection.setText(contentTamil);
-        text_view_for_english_content.setText(contentEnglish);
+        text_view_for_english_content.setText("Description: \n" + contentEnglish);
         itemImage.setImageBitmap(itemImage2);
-        owner.setText(owner1);
-        contact.setText(contact1);
+        owner.setText("Contact: " +owner1);
+        contact.setText("Owner: "+contact1);
         return view;
     }
 

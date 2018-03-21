@@ -1,6 +1,7 @@
 package com.example.akash.salesman.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,10 +10,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.akash.salesman.R;
+import com.example.akash.salesman.activity.MainActivity;
 import com.example.akash.salesman.other.DBOperations;
+
+import static com.example.akash.salesman.activity.MainActivity.navItemIndex;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,7 +28,7 @@ import com.example.akash.salesman.other.DBOperations;
  */
 public class LoginPageFragment extends Fragment {
 
-    private EditText editText, password;
+    private EditText userName, password;
     private Button login, signup;
 
 
@@ -52,29 +56,53 @@ public class LoginPageFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_loginpage, container, false);
-        editText = (EditText)view.findViewById(R.id.userID);
+        userName = (EditText)view.findViewById(R.id.userID);
         password = (EditText) view.findViewById(R.id.password);
 
         login = (Button)view.findViewById(R.id.login);
         signup = (Button)view.findViewById(R.id.signup);
 
-        login.setOnClickListener(new View.OnClickListener() {
+        signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 DBOperations dbOperations = new DBOperations(getContext());
                 dbOperations.open();
-
+                Boolean ins = dbOperations.signUpDataInsert(userName.getText().toString(), password.getText().toString());
                 dbOperations.close();
 
+                if(!ins)
+                {
+                    Toast.makeText(getActivity(),"Sign Up Failed, UserName already taken", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Toast.makeText(getActivity(),"Sign Up Successful", Toast.LENGTH_SHORT).show();
+                }
 
             }
         });
 
-        signup.setOnClickListener(new View.OnClickListener() {
+        login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                DBOperations dbOperations = new DBOperations(getContext());
+                dbOperations.open();
+                Boolean ins = dbOperations.signInDataCheck(userName.getText().toString(), password.getText().toString());
+                dbOperations.close();
 
+                if(!ins)
+                {
+                    Toast.makeText(getActivity(),"Sign In Failed, UserName or Password is wrong", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Toast.makeText(getActivity(),"Sign In Successful", Toast.LENGTH_SHORT).show();
+                    Intent randIntent = new Intent(getContext(), MainActivity.class);
+                    navItemIndex = 0;
+                    startActivity(randIntent);
+
+                }
             }
         });
 
