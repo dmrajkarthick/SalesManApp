@@ -13,7 +13,6 @@
         android:title="Bookmark"
         android:icon="@drawable/ic_menu_bookmarked"
         android:id="@+id/contentBookmark"
-        android:checked="true"
         compat:showAsAction="always" />
 
 </menu>
