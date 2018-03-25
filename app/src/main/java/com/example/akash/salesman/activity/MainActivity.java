@@ -55,12 +55,13 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
 
     // tags used to attach the fragments
     private static final String TAG_HOME = "home";
-    private static final String TAG_PHOTOS = "photos";
+    private static final String TAG_LOGIN = "photos";
     private static final String TAG_BOOKMARK = "bookmark";
     private static final String TAG_NOTIFICATIONS = "notifications";
     private static final String TAG_SETTINGS = "settings";
     private static final String TAG_MAIN_CONTENT_PAGE = "main_content_page";
     private static final String TAG_MAINCONTENTSCREENSLIDE = "screen_slider_page";
+    public static boolean LOGIN_FLAG = false;
     public static String CURRENT_TAG = TAG_HOME;
 
     Stack<FragmentInfo> activeCenterFragments = new Stack<>();
@@ -110,16 +111,25 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
 
         if (savedInstanceState == null) {
             navItemIndex = 1;
-            CURRENT_TAG = TAG_PHOTOS;
+            CURRENT_TAG = TAG_LOGIN;
 
         }
 
 
-        if(getIntent().getExtras()!=null) {
+       /* if(getIntent().getExtras()!=null) {
             if (getIntent().getExtras().getInt("navItemIndex") == 0) {
+                Log.i("navItemIndex", getIntent().getExtras().getInt("navItemIndex")+"");
                 navItemIndex = 0;
             }
-        }
+        }*/
+
+       if(LOGIN_FLAG){
+           navItemIndex = 0;
+       }
+       else{
+           navItemIndex = 1;
+       }
+
         loadHomeFragment();
     }
 
@@ -142,6 +152,10 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
      * selected from navigation menu
      */
     private void loadHomeFragment() {
+
+        if(!LOGIN_FLAG){
+            navItemIndex = 1;
+        }
         // selecting appropriate nav menu item
         selectNavMenu();
 
@@ -196,6 +210,8 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
     }
 
     private Fragment getHomeFragment() {
+
+
         switch (navItemIndex) {
             case 0:
                 // home
@@ -257,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
                         break;
                     case R.id.nav_photos:
                         navItemIndex = 1;
-                        CURRENT_TAG = TAG_PHOTOS;
+                        CURRENT_TAG = TAG_LOGIN;
                         break;
                     case R.id.nav_bookmark:
                         navItemIndex = 2;
@@ -382,17 +398,10 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-
-        // show menu only when home fragment is selected
         if (navItemIndex == 0) {
             getMenuInflater().inflate(R.menu.main, menu);
         }
 
-        // when fragment is notifications, load the menu created for notifications
-        if (navItemIndex == 3) {
-            getMenuInflater().inflate(R.menu.notifications, menu);
-        }
         return true;
     }
 
@@ -406,6 +415,9 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_logout) {
             Toast.makeText(getApplicationContext(), "Logout user!", Toast.LENGTH_LONG).show();
+            LOGIN_FLAG = false;
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
             return true;
         }
 
@@ -439,7 +451,7 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
         CURRENT_TAG = TAG_MAIN_CONTENT_PAGE;
         //selectNavigationMenu();
         setToolbarTitle();
-        if (getSupportFragmentManager().findFragmentByTag(CURRENT_TAG) != null) {
+        if (getSupportFragmentManager().findFragmentById(navItemIndex) != null) {
             drawer.closeDrawers();
 
             toggleFab();

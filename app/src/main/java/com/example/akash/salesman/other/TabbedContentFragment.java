@@ -50,13 +50,6 @@ public class TabbedContentFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.clear();
-
-        inflater.inflate(R.menu.screenslider_page, menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         /*switch (item.getItemId()) {
             case R.id.contentBookmark:
