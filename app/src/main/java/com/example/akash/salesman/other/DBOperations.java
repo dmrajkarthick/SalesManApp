@@ -254,11 +254,11 @@ public class DBOperations {
             if (dbExist) {
                 // this part of the code replaces the DB everytime App is opened!
                 this.getWritableDatabase();
-                try {
+                /*try {
                     copyDataBase();
                 } catch (IOException e) {
                     throw new Error("Error copying database");
-                }
+                }*/
             } else {
                 this.getWritableDatabase();
                 try {
@@ -343,8 +343,8 @@ public class DBOperations {
     public DBOperations open() throws SQLException
     {
         ourHelper = new DBHelper(ourContext);
-        myDataBase = ourHelper.getWritableDatabase();
-        /*try {
+        //myDataBase = ourHelper.getWritableDatabase();
+        try {
 
             ourHelper.createDataBase();
 
@@ -353,7 +353,7 @@ public class DBOperations {
             throw new Error("Unable to create database");
 
         }
-        ourHelper.openDataBase();*/
+        ourHelper.openDataBase();
         return this;
     }
 

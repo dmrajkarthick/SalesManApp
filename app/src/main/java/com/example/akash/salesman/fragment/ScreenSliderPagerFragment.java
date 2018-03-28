@@ -79,7 +79,9 @@ public class ScreenSliderPagerFragment extends Fragment {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager(), getNumberofSubTopicsInSection(), contentItem, contentItemList);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setCurrentItem(getItemPosition());
+
     }
+
 
     public int getNumberofSubTopicsInSection()
     {

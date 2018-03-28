@@ -1,12 +1,14 @@
 package com.example.akash.salesman.other;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -17,6 +19,15 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter{
     int mNumOfTabs;
     ArrayList<String> tabName;
     ContentItem contentItem;
+
+    @Override public Parcelable saveState() {
+        Bundle bundle = (Bundle) super.saveState();
+        if (bundle != null) {
+            Parcelable[] states = bundle.getParcelableArray("states");
+            bundle.putParcelableArray("states", null);
+        } else bundle = new Bundle();
+        return bundle;
+    }
     List<ContentItem> contentItemList;
 
     public SectionsPagerAdapter(FragmentManager fm, int mNumOfTabs, ContentItem c, List<ContentItem> cList) {
@@ -54,4 +65,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter{
     }
 
 
+    @Override
+    public CharSequence getPageTitle(int position) {
+        return contentItemList.get(position).getItem_name();
+    }
 }

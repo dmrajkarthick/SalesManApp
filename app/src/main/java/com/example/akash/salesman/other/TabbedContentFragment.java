@@ -1,10 +1,12 @@
 package com.example.akash.salesman.other;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.akash.salesman.R;
+import com.example.akash.salesman.activity.MainActivity;
+import com.example.akash.salesman.activity.ShareContentActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -49,13 +53,26 @@ public class TabbedContentFragment extends Fragment {
         }
     }
 
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
+        int bmValue = contentItem.getBookmark();
+        if(bmValue == 1) {
+            inflater.inflate(R.menu.bookmark_card_toolbar, menu);
+        }
+        else {
+            inflater.inflate(R.menu.screenslider_page, menu);
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        /*switch (item.getItemId()) {
+        switch (item.getItemId()) {
             case R.id.contentBookmark:
                 if(item.isChecked()){
                     item.setChecked(false);
-                    item.setIcon(R.drawable.ic_menu_gallery);
+                    item.setIcon(R.drawable.ic_menu_bookmarked);
                 }
                 else {
                     item.setChecked(true);
@@ -65,7 +82,16 @@ public class TabbedContentFragment extends Fragment {
                 dbOperations.open();
                 dbOperations.bookMarkContent(contentItem);
                 dbOperations.close();
-        }*/
+            case R.id.contentShare:
+                Bundle basket = new Bundle();
+                basket.putString("contentToBeShared", "Item Name: " + contentItem.getItem_name()+"\n"+ "Description: " + contentItem.getDisplay_content() +"\n"
+                        + "Owner: " + contentItem.getOwner() + "\n" + "Contact: " + contentItem.getContact());
+
+                Intent a = new Intent(getContext(), ShareContentActivity.class);
+                a.putExtras(basket);
+                startActivity(a);
+
+        }
         return super.onOptionsItemSelected(item);
     }
 

@@ -153,6 +153,14 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
      */
     private void loadHomeFragment() {
 
+        if(LOGIN_FLAG && navItemIndex==1)
+        {
+            Toast.makeText(this, "You are already signed in", Toast.LENGTH_SHORT).show();
+            drawer.closeDrawers();
+            return;
+        }
+
+
         if(!LOGIN_FLAG){
             navItemIndex = 1;
         }
@@ -228,8 +236,15 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
 
             case 1:
                 // photos
-                LoginPageFragment loginPageFragment = new LoginPageFragment();
-                return loginPageFragment;
+                if(LOGIN_FLAG)
+                {
+                    Toast.makeText(this, "You are already signed in", Toast.LENGTH_SHORT).show();
+                    return CategoryPageFragment.newInstance(3);
+                }
+                else {
+                    LoginPageFragment loginPageFragment = new LoginPageFragment();
+                    return loginPageFragment;
+                }
             case 2:
                 // movies fragment
                 BookMarksFragment bookMarksFragment = new BookMarksFragment();
@@ -388,7 +403,7 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
 
                 toggleFab();
                 drawer.closeDrawers();
-                invalidateOptionsMenu();
+                //invalidateOptionsMenu();
                 return;
                 //super.onBackPressed();
             }
@@ -481,7 +496,7 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
 
         toggleFab();
         drawer.closeDrawers();
-        invalidateOptionsMenu();
+        //invalidateOptionsMenu();
 
 
     }
@@ -524,7 +539,7 @@ public class MainActivity extends AppCompatActivity implements CategoryPageFragm
 
         toggleFab();
         drawer.closeDrawers();
-        invalidateOptionsMenu();
+        //invalidateOptionsMenu();
     }
 
     @Override
